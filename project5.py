@@ -162,7 +162,7 @@ if __name__=="__main__":
         cv2.resizeWindow("keypoints",(600,600))
         cv2.imshow("keypoints", matches_img)
 
-        cv2.waitKey(10)
+        cv2.waitKey(1000)
 
         # -----> Initialise the grids and points array variables <----- #
         point_correspondence_cf = np.zeros((len(matches),2))
