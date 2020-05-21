@@ -21,22 +21,19 @@ if __name__ == "__main__":
     R_origin = np.identity(3)
     final_points = []
 
-
     sift = cv2.xfeatures2d.SIFT_create(nfeatures=1500)
     bf = cv2.BFMatcher()
 
     for i in range(20, N):
         print(i)
-        frame = cv2.imread('../Visual-Odometry/FRAMES/%d.jpg'%i)
-        frame_next = cv2.imread('../Visual-Odometry/FRAMES/%d.jpg'%(i+1))
+        frame = cv2.imread('../Visual-Odometry/FRAMES/{}.jpg'.format(i))
+        frame_next = cv2.imread('../Visual-Odometry/FRAMES/{}.jpg'.format(i+1))
 
         frame = cv2.rectangle(frame,(np.float32(50),np.float32(np.shape(frame)[0])),(np.float32(1250),np.float32(800)),(0,0,0),-1)
         frame_next = cv2.rectangle(frame_next,(np.float32(50),np.float32(np.shape(frame_next)[0])),(np.float32(1250),np.float32(800)),(0,0,0),-1)
 
-
         keypoints, descriptors = sift.detectAndCompute(frame, None)
         keypoints_next, descriptors_next = sift.detectAndCompute(frame_next, None)
-
 
         matches = bf.match(descriptors,descriptors_next)
 
@@ -45,19 +42,13 @@ if __name__ == "__main__":
         for m in matches:
             U.append(keypoints[m.queryIdx].pt)
             V.append(keypoints_next[m.trainIdx].pt)
-        U=np.array(U)
-        V=np.array(V)
+        U = np.array(U)
+        V = np.array(V)
 
         F = getFundamentalMatrix(U, V, 100, 0.001)
         E = getEssentialMatrix(F, K)
-        #E_cv, _ = cv2.findEssentialMat(U, V, focal=fx, pp=(cx, cy), method=cv2.RANSAC, prob=0.999, threshold=0.5)
-        #_, cur_R, cur_t, mask = cv2.recoverPose(E, U, V, focal=fx, pp=(cx, cy))
-        #if np.linalg.det(cur_R) < 0:
-        #    cur_R = -cur_R
-        #    cur_t = -cur_t
 
-        R, C = get_camera_pose(E, U, V, K)
-        #R, C = get_camera_pose(E_cv, U, V, K)
+        R, C, X = get_camera_pose(E, U, V, K)
 
         H_final = np.hstack((R, C))
         H_final = np.vstack((H_final,[0,0,0,1]))
@@ -68,10 +59,11 @@ if __name__ == "__main__":
         x_new = H_new[0][3]
         z_new = H_new[2][3]
 
-        plt.plot([-x_old, -x_new], [z_old,z_new], 'ro')
+        plt.plot([-x_old, -x_new], [z_old, z_new], 'ro')
         final_points.append([x_old, x_new, -z_old, -z_new])
+        fname = "Output/plotPoints.npy"
+        plt.pause(0.01)
         if i % 50 == 0:
             plt.savefig("Output/plot_custom-{:05d}.png".format(i))
-            fname = "Output/plotPoints.npy"
             np.save(fname, final_points)
     np.save(fname, final_points)
