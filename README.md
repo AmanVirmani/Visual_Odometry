@@ -12,12 +12,20 @@ The following dependencies must be installed.
 ## Build Instructions
 copy Oxford_dataset folder to VisualOdometry directory
 Run the following command for Visual odometry
-```
+```bash
+python3 main.py
 ``` 
+To run the visual-odometry code using OpenCV default methods,
+```bash
+python3 visual_odometry_opencv.py
+``` 
+
 ## Extra Credits
 The the following command to compare with Inbuilt OpenCV Functions.
-```
-```
+```bash
+python3 comparison.py
+``` 
+
 ## Install Instructions
 ```
 pip install opencv-python==3.4.2.16
